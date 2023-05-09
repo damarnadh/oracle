@@ -1,0 +1,211 @@
+Topics : oracle-basics
+
+Source : https://www.oracletutorial.com/oracle-basics/
+
+Progress: (2/13 sections)   UPDATE DATE: (07-07-2022)
+
+
+SECTION 1 : QUERYING DATA (04-07-2022)
+================================================
+
+->We use SELECT  statement to query data .
+->SELECT  statement is very complex and  have many clauses such as order by, group by, having, join etc....
+->Here we study about  'from ' clause only
+
+Querying  single column from table:
+----------------------------------------------------------------
+select 
+	column1 
+from  
+	table;
+	
+Querying multiple columns from table:
+---------------------------------------------------------------------
+select
+	column1,
+	column2,
+	column3
+from
+	table;
+
+Querying all columns from table:
+--------------------------------------------------------
+select
+	column1,
+	column2,
+	..
+	..
+	..
+	columnN
+from
+	table;
+	
+	OR
+	
+select
+	*
+from
+	table;
+	
+NOTE:  USE * FOR ADHOC PURPOSE ONLY, BEST PRACTICE IS  MENTION ALL COLUMNS FOR BUSINESS PURPOSE (otherwise  afeects  application when table altered) .
+
+
+
+SECTION 2 : ORACLE ORDER BY CLAUSE (07-07-2022)
+========================================================
+->In oracle to sort the data we use order by clause with select statement.
+->we can sort by mentioning sort order (ASC or DESC) , by default the sort order is ASC.
+->we can sort multiple columns where each column may have different sort order.
+->we can use NULLS FIRST  to put all null values before non null values and NULLS LAST to put all null values after non null values , it was completely optional.
+->Always we mention sort order in the last of  the query only.
+
+SYNTAX:
+------------------------
+select
+	column1,
+	column2,
+	column3
+from
+	table
+order by 
+	column1 [desc | asc] [nulls first | nulls last],
+	..
+	..
+	columnn [asc | desc] [nulls first | nulls last];
+
+Sorting  single column from a table:
+--------------------------------------------------------------------
+select
+	column1,
+	column2,
+	column3
+from
+	table
+order by column1 desc;
+
+Sorting  multiple column from a table:
+--------------------------------------------------------------------
+select
+	column1,
+	column2,
+	column3
+from
+	table
+order by 
+	column1 desc,
+	column3 asc;
+
+Sorting  multiple column from a table by position:
+------------------------------------------------------------------------------------------
+select
+	column1,
+	column2,
+	column3
+from
+	table
+order by 
+	2 desc, -- 2 represents column2 here
+	1 asc; -- 1 represents column1 here
+	
+Sorting  date column from a table:
+--------------------------------------------------------------------
+select
+	column1,
+	column2,
+	column3,
+	date_column
+from
+	table
+order by 
+	date_column desc;
+	
+Sorting rows by the result of function or expression:
+-------------------------------------------------------------------------------------------
+select
+	customer_id,
+	customer_name,
+	order_date
+from
+	customers
+order by UPPER(customer_name) desc;
+
+
+
+SECTION 3: Filtering data(08-11-2022)
+========================================
+
+DISTINCT:
+==============
+->The DISTINCT clause used in select statement to filter duplicate rows in result set.
+->It ensures returned column or columns from in select statement are unique.
+
+SYNTAX:
+--------------------
+SELECT DISTINCT 
+	column1
+from
+	table;
+	
+Oracle  select distinct single columns example
+-----------------------------------------------------------------------------------
+SELECT DISTINCT 
+	column1
+from
+	table;
+	
+select first_name from contacts order by first_name; -- 319  Rows
+select distinct first_name from contacts order by first_name;--302  Rows after removing duplicates
+
+Oracle  select distinct multiple columns example
+-------------------------------------------------------------------------------------
+SELECT DISTINCT 
+	column1,
+	column2,
+	column3
+from
+	table;
+	
+SELECT
+    product_id,
+    quantity
+FROM
+    ORDER_ITEMS
+ORDER BY
+    product_id;--665  Rows
+
+SELECT
+    DISTINCT product_id,
+    quantity
+FROM
+    ORDER_ITEMS
+ORDER BY
+    product_id;--657  Rows after removing duplicates
+	
+SELECT
+    product_id,
+    quantity,
+    COUNT(quantity)
+FROM
+    ORDER_ITEMS
+GROUP by product_id,quantity having COUNT(quantity)>1
+ORDER BY
+    product_id;--8  Rows duplicates
+
+->The combination of these columns determines the uniqueness of data
+->It  considers all nulls as dupliccates and returns single null value.
+
+NOTE:
+------------
+->If you want to apply for some columns while skipping others we need to use group by clause.
+->DISTINCT was simillar  to unique(Not SQL Standard) but using DISTINCT was good practice.
+select first_name from contacts order by first_name; -- 319  Rows
+select distinct first_name from contacts order by first_name;--302  Rows after removing duplicates
+
+
+    
+SELECT
+    DISTINCT state
+FROM
+    locations
+ORDER BY
+    state NULLS FIRST;--only one NULL values is returned.

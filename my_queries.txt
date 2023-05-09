@@ -1,0 +1,52 @@
+--To check partitions of a table.
+select * from SYS.user_tab_partitions where table_name =  'PARTITION_MEMBERS';
+
+--TO INSERT DATA FROM ANOTHER TABLE;
+
+declare 
+
+CURSOR cur_members IS
+    SELECT
+   *
+    FROM
+    members;
+    
+    ROW_MEMBERS cur_members%ROWTYPE;
+BEGIN
+    OPEN cur_members;
+
+    LOOP
+        FETCH  cur_members  INTO ROW_MEMBERS;
+        EXIT WHEN cur_members%NOTFOUND;
+        DBMS_OUTPUT.PUT_LINE( 'memeber_id : ' ||ROW_MEMBERS.member_id || 
+' first_name: ' || ROW_MEMBERS.first_name || ' last_name: ' || ROW_MEMBERS.last_name );
+        INSERT INTO "PRACTDB"."PARTITION_MEMBERS" VALUES (ROW_MEMBERS.member_id,ROW_MEMBERS.first_name,ROW_MEMBERS.last_name,ROW_MEMBERS.gender,ROW_MEMBERS.dob,ROW_MEMBERS.email);
+    END LOOP;
+    CLOSE cur_members;
+END;
+
+
+-- TO CHEck data in a partitions
+SELECT count(*) FROM partition_members PARTITION(p5);
+
+--To check index info
+SELECT 
+    *
+FROM 
+    all_indexes
+WHERE 
+    index_name = 'PK_MEMBERS';
+
+    
+alter table copy_members  add CONSTRAINT pk_members PRIMARY key(member_id);
+
+ANALYZE INDEX PK_MEMBERS VALIDATE STRUCTURE;
+
+select * from index_stats;
+
+
+-- To check segment data
+
+select segment_name,blocks,bytes/1024 as kB from user_segments;
+
+SELECT * from user_segments;

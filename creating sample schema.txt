@@ -1,0 +1,4 @@
+alter session set "_ORACLE_SCRIPT"=true;
+->run ot_create_user.sql
+->run ot_schema.sql
+->run ot_data.sql
