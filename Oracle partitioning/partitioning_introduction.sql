@@ -1,0 +1,1 @@
+--storing data in segments based on partitioning strategy , improves performance, maintaining data will be easy.
