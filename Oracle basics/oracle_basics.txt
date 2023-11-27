@@ -209,3 +209,451 @@ FROM
     locations
 ORDER BY
     state NULLS FIRST;--only one NULL values is returned.
+
+WHERE
+========
+WHERE Clause specifies a search condition for select statement.
+
+SYNTAX
+========
+SELECT
+	column_list
+FROM
+	table_name
+WHERE
+	search_condition;
+
+Besides SELECT statement,we can use WHERE clause in the DELETE and UPDATE Statements.
+
+A)Selecting rows by single equality operator:
+SELECT
+    product_name,
+    description,
+    list_price,
+    category_id
+FROM
+    products
+WHERE
+    product_name = 'Kingston';
+
+B)Selecting rows by using the comparison operator:
+SELECT
+	product_name,
+	list_price
+FROM
+	products
+WHERE
+	list_price > 500;
+
+C)Select rows that meet some conditions:
+To combine conditions we can use AND,OR,NOT logical operators.
+SELECT
+	product_name,
+	list_price
+FROM
+	products
+WHERE
+	list_price > 500
+	AND category_id = 1;
+	
+D)Selecting rows that have values between two values:
+SELECT
+    product_name,
+    list_price
+FROM
+    products
+WHERE
+    list_price BETWEEN 650 AND 680
+ORDER BY
+    list_price;
+
+E)Selecting rows that are in a list of values:
+SELECT
+    product_name,
+    list_price
+FROM
+    products
+WHERE
+    category_id in(1,4)
+ORDER BY
+    product_name;
+
+F)Selecting rows that contains value as a part of string:
+SELECT
+    product_name,
+    category_id
+FROM
+    products
+WHERE
+    product_name LIKE '%Asus%'
+ORDER BY
+    list_price;
+	
+Alias
+======
+Oracle Alias column heading more meaningful
+
+Oracle column alias:
+====================
+SELECT
+  first_name AS forename,
+  last_name  AS surname
+FROM
+  employees;
+  
+using oracle column alias with expression
+==========================================
+SELECT
+  first_name ||' '||
+  last_name  "FULL NAME"
+FROM
+  employees;
+  
+SELECT
+  product_name,
+  list_price - standard_cost AS gross_profit
+FROM
+  products;
+  
+using order by clause with oracle column alias with expression
+===============================================================
+SELECT
+  product_name,
+  list_price - standard_cost AS gross_profit
+FROM
+  products
+ORDER BY
+  gross_profit DESC;
+  
+Oracle table alias:
+===================
+SYNTAX:
+========
+table_name AS table_alias
+table_name table_alias
+
+SELECT
+  e.first_name employee,
+  m.first_name manager
+FROM
+  employees e
+INNER JOIN employees m
+ON
+  m.employee_id = e.employee_id;
+  
+Oracle FETCH :
+==============
+select p.product_name,i.quantity 
+from OT.inventories i inner join OT.products p 
+on i.product_id=p.product_id
+order by quantity desc
+OFFSET 10 ROWS --skips first 10 rows
+FETCH NEXT 10 ROWS ONLY;
+
+Oracle And:
+===========
+A)Oracle AND to combine two boolean expressions example:
+SELECT
+	order_id,
+	customer_id,
+	status,
+	order_date
+FROM
+	orders
+WHERE
+	status = 'Pending'
+	AND customer_id = 2
+ORDER BY
+	order_date;
+
+B)Oracle AND to combine more than two boolean expressions example:
+SELECT
+    order_id,
+    customer_id,
+    status,
+    order_date
+FROM
+    orders
+WHERE
+    status = 'Shipped'
+    AND salesman_id = 60
+    AND EXTRACT(YEAR FROM order_date) = 2017
+ORDER BY
+    order_date;
+	
+C)Oracle AND to combine with OR operations:
+SELECT
+    order_id,
+    customer_id,
+    status,
+    salesman_id,
+    order_date
+FROM
+    orders
+WHERE
+    (
+        status = 'Canceled'
+        OR status = 'Pending'
+    )
+    AND customer_id = 44
+ORDER BY
+    order_date;  
+	
+Oracle OR:
+===========
+A)Oracle OR operation to combine two boolean expressions example:
+SELECT
+    order_id,
+    customer_id,
+    status,
+    order_date
+FROM
+    orders
+WHERE
+    status = 'Pending'
+    OR status = 'Canceled'
+ORDER BY
+    order_date DESC;
+
+B)Oracle OR opertaion to combine more than two boolean expressions example:
+SELECT
+    order_id,
+    customer_id,
+    status,
+    salesman_id,
+    order_date
+FROM
+    orders
+WHERE
+    salesman_id = 60
+    OR salesman_id = 61
+    OR salesman_id = 62
+ORDER BY
+    order_date DESC;
+C)Orcle OR operator combine with AND operator:
+SELECT
+    order_id,
+    customer_id,
+    status,
+    salesman_id,
+    order_date
+FROM
+    orders
+WHERE
+    (
+        status = 'Canceled'
+        OR status = 'Pending'
+    )
+    AND customer_id = 44
+ORDER BY
+    order_date;
+	
+Oracle IN:
+==========
+Oracle IN operator determines whether a value matches any value in a list or a subquery.
+A)Oracle IN example:
+SELECT
+    order_id,
+    customer_id,
+    status,
+    salesman_id
+FROM
+    orders
+WHERE
+    salesman_id IN (
+        54,
+        55,
+        56
+    )
+ORDER BY
+    order_id;
+
+SELECT
+    order_id,
+    customer_id,
+    status,
+    salesman_id
+FROM
+    orders
+WHERE
+    status IN(
+        'Pending',
+        'Canceled'
+    )
+ORDER BY
+    order_id;
+	
+B)Oracle NOT IN example:
+SELECT
+    order_id,
+    customer_id,
+    status,
+    salesman_id
+FROM
+    orders
+WHERE
+    status NOT IN(
+        'Shipped',
+        'Canceled'
+    )
+ORDER BY
+    order_id;
+
+C)Oracle IN subquery example:
+SELECT
+    employee_id,
+    first_name,
+    last_name
+FROM
+    employees
+WHERE
+    employee_id IN(
+        SELECT
+            DISTINCT salesman_id
+        FROM
+            orders
+        WHERE
+            status = 'Canceled'
+    )
+ORDER BY
+    first_Name;
+	
+D)oracle NOT IN subquery example:
+SELECT
+    customer_id,
+    name
+FROM
+    customers
+WHERE
+    customer_id NOT IN(
+        SELECT
+            customer_id
+        FROM
+            orders
+    );
+	
+E)Oracle IN vs OR
+SELECT
+    customer_id,
+    status,
+    salesman_id
+FROM
+    orders
+WHERE
+    salesman_id IN(
+        60,
+        61,
+        62
+    )
+ORDER BY
+    customer_id;
+	
+Is equal to below query
+
+SELECT
+    customer_id,
+    status,
+    salesman_id
+FROM
+    orders
+WHERE
+    salesman_id = 60
+    OR salesman_id = 61
+    OR salesman_id = 62
+ORDER BY
+    customer_id;
+
+Oracle BETWEEN operator:
+========================
+To return data within specific range
+A)Oracle BETWEEN numeric example:
+SELECT
+    product_name,
+    standard_cost
+FROM
+    products
+WHERE
+    standard_cost BETWEEN 500 AND 600
+ORDER BY
+    standard_cost;
+
+SELECT
+    product_name,
+    standard_cost
+FROM
+    products
+WHERE
+    standard_cost NOT BETWEEN 500 AND 600
+ORDER BY
+    product_name;
+
+B)Oracle BETWEEN dates example:
+SELECT
+    order_id,
+    customer_id,
+    status,
+    order_date
+FROM
+    orders
+WHERE
+    order_date BETWEEN DATE '2016-12-01' AND DATE '2016-12-31'
+ORDER BY
+    order_date;
+
+Oracle LIKE Operator:
+=====================
+Sytax:
+============
+expresion [NOT] LIKE pattern [ ESCAPE escape_characters ] 
+
+pattern includes wildcard charactors:
+% (percent) matches any string of zero or more characters.
+_ (underscore) matches any single character.
+
+SELECT
+    first_name,
+    last_name,
+    phone
+FROM
+    contacts
+WHERE
+    last_name LIKE 'St%'-- find pattern last_name starts with St
+ORDER BY
+    last_name;
+	
+SELECT
+    first_name,
+    last_name,
+    phone
+FROM
+    contacts
+WHERE
+    last_name LIKE '%er'-- find pattern last_name ends with er
+ORDER BY
+    last_name;
+
+To perform case sensitive operation use UPPER() and LOWER()
+UPPER( last_name ) LIKE 'ST%'
+
+LOWER(last_name LIKE 'st%'
+
+SELECT
+    first_name,
+    last_name,
+    email
+FROM
+    contacts
+WHERE
+    UPPER( first_name ) LIKE 'CH%'
+ORDER BY
+    first_name;
+
+NOT Like example:
+SELECT
+  first_name, last_name, phone
+FROM
+  contacts
+WHERE
+  phone NOT LIKE '+1%'
+ORDER BY
+  first_name;
